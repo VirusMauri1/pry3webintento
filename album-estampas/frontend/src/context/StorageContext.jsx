@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, useState } from "react";
+import { createContext, useContext, useReducer, useEffect, useState, useMemo } from "react";
 import { itemsReducer } from "./itemsReducer";
 import { crearRegistro } from "../utils/itemFactory";
 
@@ -7,110 +7,58 @@ const StorageContext = createContext(null);
 export function StorageProvider({ children }) {
   const [items, dispatch] = useReducer(itemsReducer, [], () => {
     try {
-      const guardado = localStorage.getItem("items");
-      return guardado ? JSON.parse(guardado) : [];
-    } catch {
-      return [];
-    }
+      const g = localStorage.getItem("items");
+      return g ? JSON.parse(g) : [];
+    } catch { return []; }
   });
 
   const [registros, setRegistros] = useState(() => {
     try {
-      const guardado = localStorage.getItem("registros");
-      return guardado ? JSON.parse(guardado) : [];
-    } catch {
-      return [];
-    }
+      const g = localStorage.getItem("registros");
+      return g ? JSON.parse(g) : [];
+    } catch { return []; }
   });
 
-  const [filtros, setFiltros] = useState({
-    categoriaId: "",
-    estado: "",
-    busqueda: ""
-  });
+  const [filtros, setFiltros] = useState({ categoriaId: "", estado: "", busqueda: "" });
 
-  // Sincronizar items con localStorage
-  useEffect(() => {
-    localStorage.setItem("items", JSON.stringify(items));
-  }, [items]);
+  useEffect(() => { localStorage.setItem("items", JSON.stringify(items)); }, [items]);
+  useEffect(() => { localStorage.setItem("registros", JSON.stringify(registros)); }, [registros]);
 
-  // Sincronizar registros con localStorage
-  useEffect(() => {
-    localStorage.setItem("registros", JSON.stringify(registros));
-  }, [registros]);
+  const agregarItem   = (item)         => dispatch({ type: "AGREGAR",       payload: item });
+  const editarItem    = (item)         => dispatch({ type: "EDITAR",        payload: item });
+  const eliminarItem  = (id)           => dispatch({ type: "ELIMINAR",      payload: id });
+  const archivarItem  = (id)           => dispatch({ type: "ARCHIVAR",      payload: id });
+  const restaurarItem = (id)           => dispatch({ type: "RESTAURAR",     payload: id });
+  const cambiarEstado = (id, estado)   => dispatch({ type: "CAMBIAR_ESTADO", payload: { id, estado } });
 
-  // CRUD items
-  const agregarItem = (item) => dispatch({ type: "AGREGAR", payload: item });
-
-  const editarItem = (item) => dispatch({ type: "EDITAR", payload: item });
-
-  const eliminarItem = (id) => dispatch({ type: "ELIMINAR", payload: id });
-
-  const archivarItem = (id) => dispatch({ type: "ARCHIVAR", payload: id });
-
-  const restaurarItem = (id) => dispatch({ type: "RESTAURAR", payload: id });
-
-  const cambiarEstado = (id, estado) =>
-    dispatch({ type: "CAMBIAR_ESTADO", payload: { id, estado } });
-
-  const toggleAtributo = (id, campo) =>
-    dispatch({ type: "TOGGLE_ATRIBUTO", payload: { id, campo } });
-
-  const toggleCampo = (id, campo) =>
-    dispatch({ type: "TOGGLE", payload: { id, campo } });
-
-  // Registros
   const agregarRegistro = (datos) => {
-    const registro = crearRegistro(datos);
-    setRegistros((prev) => [...prev, registro]);
-    // Actualizar fechaActividad del item
-    dispatch({
-      type: "EDITAR",
-      payload: { id: datos.itemId, fechaActividad: new Date().toISOString() }
-    });
-    return registro;
+    const r = crearRegistro(datos);
+    setRegistros((prev) => [...prev, r]);
+    dispatch({ type: "EDITAR", payload: { id: datos.itemId, fechaActividad: new Date().toISOString() } });
+    return r;
   };
 
-  const getRegistrosDeItem = (itemId) =>
-    registros.filter((r) => r.itemId === itemId);
+  const itemsFiltrados = useMemo(() =>
+    items.filter((item) => {
+      if (!item.activo) return false;
+      if (filtros.categoriaId && item.categoriaId !== filtros.categoriaId) return false;
+      if (filtros.estado && item.estado !== filtros.estado) return false;
+      if (filtros.busqueda) {
+        const b = filtros.busqueda.toLowerCase();
+        if (!item.nombre.toLowerCase().includes(b) && !(item.notas || "").toLowerCase().includes(b)) return false;
+      }
+      return true;
+    }), [items, filtros]);
 
-  // Items filtrados
-  const itemsFiltrados = items.filter((item) => {
-    if (!item.activo) return false;
-    if (filtros.categoriaId && item.categoriaId !== filtros.categoriaId) return false;
-    if (filtros.estado && item.estado !== filtros.estado) return false;
-    if (filtros.busqueda) {
-      const b = filtros.busqueda.toLowerCase();
-      if (!item.nombre.toLowerCase().includes(b) && !item.notas?.toLowerCase().includes(b))
-        return false;
-    }
-    return true;
-  });
-
-  const itemsArchivados = items.filter((i) => !i.activo);
+  const itemsArchivados = useMemo(() => items.filter((i) => !i.activo), [items]);
 
   return (
-    <StorageContext.Provider
-      value={{
-        items,
-        itemsFiltrados,
-        itemsArchivados,
-        registros,
-        filtros,
-        setFiltros,
-        agregarItem,
-        editarItem,
-        eliminarItem,
-        archivarItem,
-        restaurarItem,
-        cambiarEstado,
-        toggleAtributo,
-        toggleCampo,
-        agregarRegistro,
-        getRegistrosDeItem,
-        dispatch
-      }}
-    >
+    <StorageContext.Provider value={{
+      items, itemsFiltrados, itemsArchivados, registros,
+      filtros, setFiltros,
+      agregarItem, editarItem, eliminarItem, archivarItem, restaurarItem,
+      cambiarEstado, agregarRegistro,
+    }}>
       {children}
     </StorageContext.Provider>
   );

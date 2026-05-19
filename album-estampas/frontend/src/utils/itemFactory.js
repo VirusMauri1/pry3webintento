@@ -8,14 +8,8 @@ export function crearItem({ nombre, categoriaId, estado, puntuacion, notas, atri
     fechaRegistro: new Date().toISOString(),
     fechaActividad: new Date().toISOString(),
     notas: notas || "",
-    atributos: atributos || {
-      numero: "",
-      seccion: "",
-      repetida: false,
-      pegada: false,
-      rareza: "común"
-    },
-    activo: true
+    atributos: atributos || { numero: "", seccion: "", repetida: false, pegada: false, rareza: "común" },
+    activo: true,
   };
 }
 
@@ -25,6 +19,6 @@ export function crearRegistro({ itemId, valor, notas }) {
     itemId,
     fecha: new Date().toISOString().split("T")[0],
     valor: Number(valor) || 1,
-    notas: notas || ""
+    notas: notas || "",
   };
 }
