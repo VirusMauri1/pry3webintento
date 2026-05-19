@@ -1,0 +1,118 @@
+:root {
+  --bg-primary: #181925;
+  --bg-secondary: #1e2130;
+  --bg-card: #232638;
+  --bg-card-hover: #2a2f47;
+  --cyan: #C0F5FA;
+  --cyan-dim: #7ee8f0;
+  --cyan-muted: rgba(192, 245, 250, 0.12);
+  --text-primary: #f0f4ff;
+  --text-secondary: #8b90b0;
+  --text-muted: #555a7a;
+  --border: rgba(192, 245, 250, 0.1);
+  --border-strong: rgba(192, 245, 250, 0.25);
+  --success: #4ade80;
+  --warning: #facc15;
+  --danger: #f87171;
+  --purple: #a78bfa;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+  --shadow-cyan: 0 0 20px rgba(192, 245, 250, 0.08);
+  --font-display: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  min-height: 100vh;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-dim); }
+
+/* Inputs globales */
+input, select, textarea {
+  font-family: var(--font-display);
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 14px;
+  width: 100%;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 0 3px rgba(192, 245, 250, 0.08);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--text-muted);
+}
+
+select option {
+  background: var(--bg-card);
+}
+
+/* Botones */
+button {
+  font-family: var(--font-display);
+  cursor: pointer;
+  border: none;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+/* Utility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
