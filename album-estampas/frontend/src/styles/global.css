@@ -1,38 +1,105 @@
+/* ── Variables de tema ──────────────────────────────────────────────────── */
+
+:root {
+  /* Fondos */
+  --color-bg:           #181925;
+  --color-bg-surface:   #232638;
+  --color-bg-elevated:  #1e2130;
+
+  /* Texto */
+  --color-text:         #f0f4ff;
+  --color-text-muted:   #8b90b0;
+  --color-text-subtle:  #555a7a;
+
+  /* Acento principal */
+  --color-accent:       #C0F5FA;
+  --color-accent-dim:   rgba(192, 245, 250, 0.1);
+  --color-accent-border: rgba(192, 245, 250, 0.25);
+
+  /* Estados semánticos */
+  --color-success:      #4ade80;
+  --color-warning:      #facc15;
+  --color-danger:       #f87171;
+  --color-info:         #60a5fa;
+  --color-purple:       #a78bfa;
+
+  /* Bordes */
+  --color-border:       rgba(192, 245, 250, 0.1);
+
+  /* Scrollbar */
+  --color-scrollbar-track: #1e2130;
+  --color-scrollbar-thumb: rgba(192, 245, 250, 0.25);
+}
+
+body[data-theme='claro'] {
+  --color-bg:           #f4f6fb;
+  --color-bg-surface:   #ffffff;
+  --color-bg-elevated:  #e8ecf5;
+
+  --color-text:         #1a1c2e;
+  --color-text-muted:   #4a4f6a;
+  --color-text-subtle:  #8b90b0;
+
+  --color-accent:       #1a73c8;
+  --color-accent-dim:   rgba(26, 115, 200, 0.08);
+  --color-accent-border: rgba(26, 115, 200, 0.3);
+
+  --color-success:      #16a34a;
+  --color-warning:      #d97706;
+  --color-danger:       #dc2626;
+  --color-info:         #2563eb;
+  --color-purple:       #7c3aed;
+
+  --color-border:       rgba(26, 115, 200, 0.15);
+
+  --color-scrollbar-track: #e8ecf5;
+  --color-scrollbar-thumb: rgba(26, 115, 200, 0.3);
+}
+
+/* ── Reset ──────────────────────────────────────────────────────────────── */
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  background: #181925;
-  color: #f0f4ff;
+  background: var(--color-bg);
+  color: var(--color-text);
   font-family: system-ui, -apple-system, sans-serif;
   min-height: 100vh;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #1e2130; }
-::-webkit-scrollbar-thumb { background: rgba(192,245,250,0.25); border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--color-scrollbar-track); }
+::-webkit-scrollbar-thumb { background: var(--color-scrollbar-thumb); border-radius: 3px; }
+
+/* ── Controles de formulario ─────────────────────────────────────────────── */
 
 input, select, textarea {
   font-family: inherit;
-  background: #1e2130;
-  color: #f0f4ff;
-  border: 1px solid rgba(192,245,250,0.1);
+  background: var(--color-bg-elevated);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 9px 12px;
   font-size: 13px;
   width: 100%;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.2s, background 0.2s;
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: #C0F5FA;
-  box-shadow: 0 0 0 2px rgba(192,245,250,0.08);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-dim);
 }
 
-input::placeholder, textarea::placeholder { color: #555a7a; }
-select option { background: #232638; }
+input::placeholder, textarea::placeholder { color: var(--color-text-subtle); }
+select option { background: var(--color-bg-surface); color: var(--color-text); }
+
+/* ── Botones ─────────────────────────────────────────────────────────────── */
 
 button {
   font-family: inherit;
@@ -43,4 +110,4 @@ button {
 }
 
 button:active { transform: scale(0.97); }
-button:hover { opacity: 0.88; }
+button:hover  { opacity: 0.88; }

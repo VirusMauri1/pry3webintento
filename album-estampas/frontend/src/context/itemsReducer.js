@@ -1,6 +1,8 @@
 export function itemsReducer(state, action) {
   const now = new Date().toISOString();
   switch (action.type) {
+    case "REEMPLAZAR":
+      return action.payload;
     case "AGREGAR":
       return [...state, action.payload];
     case "EDITAR":
