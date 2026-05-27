@@ -10,19 +10,13 @@ const NAV_ITEMS = [
   { id: "agregar",  label: "Agregar" },
 ];
 
-function Navbar({ vista, setVista, nombreInputRef }) {
-  const { items, modo, setModo, obtenerItems } = useStorage();
+function Navbar({ vista, setVista }) {
+  const { items, modo, setModo } = useStorage();
   const { tema, toggleTema } = useTheme();
 
   const total   = items.filter((i) => i.activo).length;
   const pegadas = items.filter((i) => i.activo && i.estado === "pegada").length;
   const pct     = total > 0 ? Math.round((pegadas / total) * 100) : 0;
-
-  const handleModo = () => {
-    const nuevoModo = modo === "local" ? "api" : "local";
-    setModo(nuevoModo);
-    // obtenerItems se dispara automáticamente en StorageContext al cambiar modo
-  };
 
   return (
     <nav style={{
@@ -35,7 +29,6 @@ function Navbar({ vista, setVista, nombreInputRef }) {
         display: "flex", alignItems: "center", justifyContent: "space-between", height: 60,
       }}>
 
-        {/* Tabs de navegación */}
         <div style={{ display: "flex", gap: 4 }}>
           {NAV_ITEMS.map((n) => (
             <button key={n.id} onClick={() => setVista(n.id)}
@@ -50,11 +43,9 @@ function Navbar({ vista, setVista, nombreInputRef }) {
           ))}
         </div>
 
-        {/* Controles de la derecha */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {/* Switch modo */}
           <button
-            onClick={handleModo}
+            onClick={() => setModo(modo === "local" ? "api" : "local")}
             title={`Modo actual: ${modo}. Click para cambiar.`}
             style={{
               background: modo === "api" ? "rgba(96,165,250,0.15)" : "var(--color-accent-dim)",
@@ -65,10 +56,8 @@ function Navbar({ vista, setVista, nombreInputRef }) {
             {modo === "api" ? "🌐 API" : "💾 Local"}
           </button>
 
-          {/* Toggle tema */}
           <button
             onClick={toggleTema}
-            title={`Tema ${tema === "oscuro" ? "claro" : "oscuro"} (atajo: T)`}
             style={{
               background: "var(--color-accent-dim)",
               color: "var(--color-accent)",
@@ -78,7 +67,6 @@ function Navbar({ vista, setVista, nombreInputRef }) {
             {tema === "oscuro" ? "☀️" : "🌙"}
           </button>
 
-          {/* Barra de progreso */}
           <div style={{
             display: "flex", alignItems: "center", gap: 8,
             background: "var(--color-bg-elevated)", padding: "5px 12px", borderRadius: 20,
@@ -101,43 +89,34 @@ function AppInner() {
   const [vista, setVista] = useState("estampas");
   const [itemEditando, setItemEditando] = useState(null);
   const { toggleTema } = useTheme();
-
-  // Ref para poder enfocar el input nombre desde el atajo Ctrl+N
   const nombreInputRef = useRef(null);
 
-  // ── Atajos de teclado ────────────────────────────────────────────────────
+  const irAgregar = () => {
+    setVista("agregar");
+    setTimeout(() => {
+      if (nombreInputRef.current) nombreInputRef.current.focus();
+    }, 50);
+  };
+
   useEffect(() => {
     const handler = (e) => {
-      // T → toggle tema (solo si no estamos escribiendo en un input/textarea/select)
-      if (
-        e.key === "t" || e.key === "T"
-      ) {
-        const tag = document.activeElement?.tagName;
-        if (tag !== "INPUT" && tag !== "TEXTAREA" && tag !== "SELECT") {
-          toggleTema();
-        }
-      }
+      const tag = document.activeElement?.tagName;
+      const enInput = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
 
-      // Ctrl+N → navegar a "agregar" y enfocar el campo nombre
-      if ((e.ctrlKey || e.metaKey) && e.key === "n") {
+      if ((e.key === "t" || e.key === "T") && !enInput) toggleTema();
+
+      if (e.altKey && (e.key === "n" || e.key === "N")) {
         e.preventDefault();
-        setVista("agregar");
-        // Pequeño timeout para que el componente monte antes de enfocar
-        setTimeout(() => {
-          if (nombreInputRef.current) {
-            nombreInputRef.current.focus();
-          }
-        }, 50);
+        irAgregar();
       }
     };
-
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [toggleTema]);
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--color-bg)" }}>
-      <Navbar vista={vista} setVista={setVista} nombreInputRef={nombreInputRef} />
+      <Navbar vista={vista} setVista={setVista} />
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "28px 20px" }}>
         {vista === "agregar" ? (
@@ -153,7 +132,28 @@ function AppInner() {
             />
           </div>
         ) : (
-          <ListaItems onEditar={setItemEditando} />
+          <>
+            {/* Hint de atajo, sin botón */}
+            <p style={{
+              fontSize: 12,
+              color: "var(--color-text-subtle)",
+              textAlign: "right",
+              marginBottom: 16,
+            }}>
+              Presiona{" "}
+              <kbd style={{
+                background: "var(--color-bg-elevated)",
+                border: "1px solid var(--color-border)",
+                borderRadius: 4,
+                padding: "1px 6px",
+                fontSize: 11,
+                fontFamily: "monospace",
+                color: "var(--color-text-muted)",
+              }}>Alt+N</kbd>
+              {" "}para agregar una nueva estampa
+            </p>
+            <ListaItems onEditar={setItemEditando} />
+          </>
         )}
       </main>
 
