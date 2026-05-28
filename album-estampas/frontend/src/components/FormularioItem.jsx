@@ -27,16 +27,14 @@ export function FormularioItem({ onGuardado, itemEditar = null, onCancelar, nomb
     pegada:      itemEditar?.atributos?.pegada   || false,
   });
 
-  // useRef propio para el input de nombre (auto-focus al montar)
   const localInputRef = useRef(null);
 
-  // Al montar el formulario, enfocar el campo nombre
   useEffect(() => {
     const ref = nombreInputRef || localInputRef;
     if (ref.current) {
       ref.current.focus();
     }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); 
 
   const set = (campo) => (e) => {
     const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;
@@ -74,8 +72,6 @@ export function FormularioItem({ onGuardado, itemEditar = null, onCancelar, nomb
     if (onGuardado) onGuardado();
   };
 
-  // Usamos el ref externo si nos lo pasan (desde App.jsx para el atajo Ctrl+N),
-  // de lo contrario usamos el local.
   const refToUse = nombreInputRef || localInputRef;
 
   return (
@@ -96,7 +92,6 @@ export function FormularioItem({ onGuardado, itemEditar = null, onCancelar, nomb
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
         <div style={{ gridColumn: "1 / -1" }}>
           <label style={labelStyle}>Nombre *</label>
-          {/* El ref aquí es la clave del useRef para auto-focus (Fase 2) */}
           <input
             ref={refToUse}
             type="text"

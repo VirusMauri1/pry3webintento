@@ -29,7 +29,7 @@ function lsSet(key, value) {
 export function StorageProvider({ children }) {
   const [modo, _setModo] = useState(() => lsGet("modo") || "local");
 
-  // Inicializar items desde localStorage siempre en modo local
+  // empezar siempre en modo local 
   const [items, dispatch] = useReducer(itemsReducer, [], () => {
     const modoInicial = lsGet("modo") || "local";
     if (modoInicial === "local") return lsGet("items") || [];
@@ -47,7 +47,6 @@ export function StorageProvider({ children }) {
     return () => { mountedRef.current = false; };
   }, []);
 
-  // ── CLAVE: persistir items en localStorage cada vez que cambian (solo modo local)
   useEffect(() => {
     if (modo === "local") {
       lsSet("items", items);
@@ -58,13 +57,11 @@ export function StorageProvider({ children }) {
     lsSet("registros", registros);
   }, [registros]);
 
-  // ── Cargar desde API al montar si el modo es api
   useEffect(() => {
     if (modo === "api") obtenerItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ── Cambio de modo
+  // Cambio de modo
   const setModo = useCallback((nuevoModo) => {
     lsSet("modo", nuevoModo);
     _setModo(nuevoModo);
@@ -72,15 +69,13 @@ export function StorageProvider({ children }) {
       const saved = lsGet("items") || [];
       dispatch({ type: "REEMPLAZAR", payload: saved });
     }
-    // Si es "api", el useEffect de abajo lo carga
   }, []);
 
   useEffect(() => {
     if (modo === "api") obtenerItems();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modo]);
 
-  // ── Obtener items
+  // Obtener items
   const obtenerItems = useCallback(async () => {
     setCargando(true);
     setError(null);
@@ -101,8 +96,7 @@ export function StorageProvider({ children }) {
     }
   }, [modo]);
 
-  // ── Agregar / editar item
-  // En modo local: solo dispatch. El useEffect de arriba persiste automáticamente.
+  // Agregar y editar item
   const agregarItem = useCallback(async (item) => {
     if (modo === "api") {
       try {
@@ -198,7 +192,7 @@ export function StorageProvider({ children }) {
     return r;
   }, [modo]);
 
-  // ── Filtros
+  // Filtros
   const itemsFiltrados = useMemo(() =>
     items.filter((item) => {
       if (!item.activo) return false;
@@ -216,7 +210,6 @@ export function StorageProvider({ children }) {
 
   const itemsArchivados = useMemo(() => items.filter((i) => !i.activo), [items]);
 
-  // Alias para compatibilidad con código existente
   const guardarItem = useCallback((item) =>
     item.id ? editarItem(item) : agregarItem(item), [agregarItem, editarItem]);
 

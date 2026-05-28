@@ -105,7 +105,7 @@ function AppInner() {
 
       if ((e.key === "t" || e.key === "T") && !enInput) toggleTema();
 
-      if (e.altKey && (e.key === "n" || e.key === "N")) {
+      if (e.altKey && (e.key === "n" || e.key === "N")) { // Alt+N y no ctrl + n ya que abre nueva ventana
         e.preventDefault();
         irAgregar();
       }
@@ -133,7 +133,7 @@ function AppInner() {
           </div>
         ) : (
           <>
-            {/* Hint de atajo, sin botón */}
+            {/* se muestra el hint de atajo */}
             <p style={{
               fontSize: 12,
               color: "var(--color-text-subtle)",

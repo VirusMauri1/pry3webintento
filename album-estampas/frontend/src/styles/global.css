@@ -1,5 +1,4 @@
-/* ── Variables de tema ──────────────────────────────────────────────────── */
-
+ /* colores y temas */
 :root {
   /* Fondos */
   --color-bg:           #181925;
@@ -11,25 +10,22 @@
   --color-text-muted:   #8b90b0;
   --color-text-subtle:  #555a7a;
 
-  /* Acento principal */
   --color-accent:       #C0F5FA;
   --color-accent-dim:   rgba(192, 245, 250, 0.1);
   --color-accent-border: rgba(192, 245, 250, 0.25);
 
-  /* Estados semánticos */
   --color-success:      #4ade80;
   --color-warning:      #facc15;
   --color-danger:       #f87171;
   --color-info:         #60a5fa;
   --color-purple:       #a78bfa;
-
-  /* Bordes */
   --color-border:       rgba(192, 245, 250, 0.1);
 
   /* Scrollbar */
   --color-scrollbar-track: #1e2130;
   --color-scrollbar-thumb: rgba(192, 245, 250, 0.25);
 }
+/* el otro tema de colores*/
 
 body[data-theme='claro'] {
   --color-bg:           #f4f6fb;
@@ -56,7 +52,6 @@ body[data-theme='claro'] {
   --color-scrollbar-thumb: rgba(26, 115, 200, 0.3);
 }
 
-/* ── Reset ──────────────────────────────────────────────────────────────── */
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -70,13 +65,13 @@ body {
   transition: background 0.25s ease, color 0.25s ease;
 }
 
-/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+/* el scroll personalizado */
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--color-scrollbar-track); }
 ::-webkit-scrollbar-thumb { background: var(--color-scrollbar-thumb); border-radius: 3px; }
 
-/* ── Controles de formulario ─────────────────────────────────────────────── */
+/* los detalles del formulario */
 
 input, select, textarea {
   font-family: inherit;
@@ -99,7 +94,7 @@ input:focus, select:focus, textarea:focus {
 input::placeholder, textarea::placeholder { color: var(--color-text-subtle); }
 select option { background: var(--color-bg-surface); color: var(--color-text); }
 
-/* ── Botones ─────────────────────────────────────────────────────────────── */
+/* los botones y sus efectos */
 
 button {
   font-family: inherit;
@@ -110,4 +105,4 @@ button {
 }
 
 button:active { transform: scale(0.97); }
-button:hover  { opacity: 0.88; }
+button:hover { opacity: 0.88; }

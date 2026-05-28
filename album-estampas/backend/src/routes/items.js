@@ -21,7 +21,6 @@ const parseItem = (item) => {
   };
 };
 
-// GET /api/items
 router.get("/", async (req, res) => {
   try {
     const items = await db`
@@ -38,7 +37,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// GET /api/items/:id
 router.get("/:id", async (req, res) => {
   try {
 
@@ -62,7 +60,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST /api/items
 router.post("/", async (req, res) => {
   try {
     const {
@@ -109,7 +106,7 @@ router.post("/", async (req, res) => {
     });
   }
 });
-// PUT /api/items/:id
+
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -170,7 +167,7 @@ router.put("/:id", async (req, res) => {
     });
   }
 });
-// DELETE /api/items/:id
+
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -197,7 +194,7 @@ router.delete("/:id", async (req, res) => {
     });
   }
 });
-// POST /api/items/:id/registro
+
 router.post("/:id/registro", async (req, res) => {
   try {
     const { id } = req.params;
@@ -238,7 +235,6 @@ router.post("/:id/registro", async (req, res) => {
   }
 });
 
-// GET /api/items/:id/registros
 router.get("/:id/registros", async (req, res) => {
   try {
     const registros = await db`
