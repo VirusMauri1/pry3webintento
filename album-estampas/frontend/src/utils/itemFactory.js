@@ -22,3 +22,15 @@ export function crearRegistro({ itemId, valor, notas }) {
     notas: notas || "",
   };
 }
+
+// Evento de progreso de colección: +1 al pegar una estampa, -1 al despegarla.
+// La fecha (día) se guarda para poder reconstruir la evolución acumulada.
+export function crearEventoProgreso({ itemId, delta }) {
+  return {
+    id: crypto.randomUUID(),
+    tipo: "progreso",
+    itemId,
+    delta,                                       // +1 o -1
+    fecha: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+  };
+}

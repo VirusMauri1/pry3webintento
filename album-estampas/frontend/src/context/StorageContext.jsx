@@ -2,8 +2,9 @@ import {
   createContext, useContext, useReducer, useEffect,
   useState, useMemo, useRef, useCallback
 } from "react";
-import { itemsReducer } from "./itemsReducer";
-import { crearRegistro } from "../utils/itemFactory";
+import { itemsReducer, initialState } from "../reducers/itemsReducer";
+import { crearRegistro, crearEventoProgreso } from "../utils/itemFactory";
+import { generarSetMundial } from "../data/estampasMundial";
 
 const API_URL = "http://localhost:3001/api/items";
 const StorageContext = createContext(null);
@@ -29,15 +30,28 @@ function lsSet(key, value) {
 export function StorageProvider({ children }) {
   const [modo, _setModo] = useState(() => lsGet("modo") || "local");
 
-  // empezar siempre en modo local 
-  const [items, dispatch] = useReducer(itemsReducer, [], () => {
+  // El reducer ahora maneja { lista, filtroCategoria, filtroEstado, busqueda }.
+  // empezar siempre con la lista local si el modo inicial es local
+  const [state, dispatch] = useReducer(itemsReducer, initialState, (base) => {
     const modoInicial = lsGet("modo") || "local";
-    if (modoInicial === "local") return lsGet("items") || [];
-    return [];
+    if (modoInicial === "local") {
+      const guardadas = lsGet("items");
+      // Si el álbum está vacío la primera vez, se siembra el set del Mundial
+      const lista = (guardadas && guardadas.length > 0) ? guardadas : generarSetMundial();
+      return { ...base, lista };
+    }
+    return base;
   });
 
+  const { lista: items, filtroCategoria, filtroEstado, busqueda } = state;
+
+  // ref siempre apuntando a la lista actual, para leer el estado anterior
+  // de una estampa sin meter `items` en las deps de los useCallback
+  // (lo que recrearía los handlers y rompería React.memo en ItemCard).
+  const itemsRef = useRef(items);
+  useEffect(() => { itemsRef.current = items; }, [items]);
+
   const [registros, setRegistros] = useState(() => lsGet("registros") || []);
-  const [filtros, setFiltros] = useState({ categoriaId: "", estado: "", busqueda: "" });
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
 
@@ -57,24 +71,6 @@ export function StorageProvider({ children }) {
     lsSet("registros", registros);
   }, [registros]);
 
-  useEffect(() => {
-    if (modo === "api") obtenerItems();
-  }, []);
-
-  // Cambio de modo
-  const setModo = useCallback((nuevoModo) => {
-    lsSet("modo", nuevoModo);
-    _setModo(nuevoModo);
-    if (nuevoModo === "local") {
-      const saved = lsGet("items") || [];
-      dispatch({ type: "REEMPLAZAR", payload: saved });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (modo === "api") obtenerItems();
-  }, [modo]);
-
   // Obtener items
   const obtenerItems = useCallback(async () => {
     setCargando(true);
@@ -84,10 +80,10 @@ export function StorageProvider({ children }) {
         const res = await fetch(API_URL);
         if (!res.ok) throw new Error(`API error ${res.status}`);
         const data = await res.json();
-        if (mountedRef.current) dispatch({ type: "REEMPLAZAR", payload: data });
+        if (mountedRef.current) dispatch({ type: "HIDRATAR", payload: data });
       } else {
         const data = lsGet("items") || [];
-        dispatch({ type: "REEMPLAZAR", payload: data });
+        dispatch({ type: "HIDRATAR", payload: data });
       }
     } catch (err) {
       if (mountedRef.current) setError(err.message);
@@ -95,6 +91,20 @@ export function StorageProvider({ children }) {
       if (mountedRef.current) setCargando(false);
     }
   }, [modo]);
+
+  // Cambio de modo
+  const setModo = useCallback((nuevoModo) => {
+    lsSet("modo", nuevoModo);
+    _setModo(nuevoModo);
+    if (nuevoModo === "local") {
+      const saved = lsGet("items") || [];
+      dispatch({ type: "HIDRATAR", payload: saved });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (modo === "api") obtenerItems();
+  }, [modo, obtenerItems]);
 
   // Agregar y editar item
   const agregarItem = useCallback(async (item) => {
@@ -123,14 +133,14 @@ export function StorageProvider({ children }) {
           method: "PUT",
           body: JSON.stringify(item),
         });
-        dispatch({ type: "EDITAR", payload: actualizado });
+        dispatch({ type: "EDITAR", payload: { ...actualizado, fechaActividad: new Date().toISOString() } });
         return actualizado;
       } catch (err) {
         setError(err.message);
         return null;
       }
     } else {
-      dispatch({ type: "EDITAR", payload: item });
+      dispatch({ type: "EDITAR", payload: { ...item, fechaActividad: new Date().toISOString() } });
       return item;
     }
   }, [modo]);
@@ -140,7 +150,7 @@ export function StorageProvider({ children }) {
       try { await apiFetch(`/${id}`, { method: "DELETE" }); }
       catch (err) { setError(err.message); return; }
     }
-    dispatch({ type: "ARCHIVAR", payload: id });
+    dispatch({ type: "ELIMINAR", payload: { id, fechaActividad: new Date().toISOString() } });
   }, [modo]);
 
   const restaurarItem = useCallback(async (id) => {
@@ -152,7 +162,7 @@ export function StorageProvider({ children }) {
         });
       } catch (err) { setError(err.message); return; }
     }
-    dispatch({ type: "RESTAURAR", payload: id });
+    dispatch({ type: "RESTAURAR", payload: { id, fechaActividad: new Date().toISOString() } });
   }, [modo]);
 
   const eliminarItem = useCallback(async (id) => {
@@ -160,7 +170,7 @@ export function StorageProvider({ children }) {
       try { await apiFetch(`/${id}`, { method: "DELETE" }); }
       catch (err) { setError(err.message); return; }
     }
-    dispatch({ type: "ELIMINAR", payload: id });
+    dispatch({ type: "BORRAR", payload: id });
   }, [modo]);
 
   const cambiarEstado = useCallback(async (id, estado) => {
@@ -172,7 +182,16 @@ export function StorageProvider({ children }) {
         });
       } catch (err) { setError(err.message); return; }
     }
-    dispatch({ type: "CAMBIAR_ESTADO", payload: { id, estado } });
+    dispatch({ type: "CAMBIAR_ESTADO", payload: { id, estado, fechaActividad: new Date().toISOString() } });
+
+    // Registrar evento de progreso: +1 si pasa a pegada, -1 si deja de estar pegada.
+    const anterior = itemsRef.current.find((i) => i.id === id);
+    const estabaPegada = anterior?.estado === "pegada";
+    const quedaPegada = estado === "pegada";
+    if (estabaPegada !== quedaPegada) {
+      const delta = quedaPegada ? 1 : -1;
+      setRegistros((prev) => [...prev, crearEventoProgreso({ itemId: id, delta })]);
+    }
   }, [modo]);
 
   const agregarRegistro = useCallback(async (datos) => {
@@ -188,25 +207,53 @@ export function StorageProvider({ children }) {
       }
     }
     setRegistros((prev) => [...prev, r]);
-    dispatch({ type: "EDITAR", payload: { id: datos.itemId, fechaActividad: new Date().toISOString() } });
+    dispatch({ type: "REGISTRAR_ACTIVIDAD", payload: { id: datos.itemId, fechaActividad: new Date().toISOString() } });
     return r;
   }, [modo]);
 
-  // Filtros
+  // --- Filtros ahora viven en el reducer (acciones FILTRAR / LIMPIAR_FILTROS) ---
+
+  // objeto de filtros derivado, con la misma forma { categoriaId, estado, busqueda }
+  // que ya consumía ListaItems, para no cambiar ese componente.
+  const filtros = useMemo(
+    () => ({ categoriaId: filtroCategoria, estado: filtroEstado, busqueda }),
+    [filtroCategoria, filtroEstado, busqueda]
+  );
+
+  // setFiltros acepta tanto un objeto como una función updater (igual que useState),
+  // y traduce a la acción FILTRAR del reducer.
+  const setFiltros = useCallback((next) => {
+    const prev = { categoriaId: filtroCategoria, estado: filtroEstado, busqueda };
+    const val = typeof next === "function" ? next(prev) : next;
+    dispatch({
+      type: "FILTRAR",
+      payload: {
+        filtroCategoria: val.categoriaId,
+        filtroEstado: val.estado,
+        busqueda: val.busqueda,
+      },
+    });
+  }, [filtroCategoria, filtroEstado, busqueda]);
+
+  const limpiarFiltros = useCallback(() => {
+    dispatch({ type: "LIMPIAR_FILTROS" });
+  }, []);
+
+  // Lista filtrada: solo se recalcula si cambian la lista o los filtros (useMemo)
   const itemsFiltrados = useMemo(() =>
     items.filter((item) => {
       if (!item.activo) return false;
-      if (filtros.categoriaId && item.categoriaId !== filtros.categoriaId) return false;
-      if (filtros.estado && item.estado !== filtros.estado) return false;
-      if (filtros.busqueda) {
-        const b = filtros.busqueda.toLowerCase();
+      if (filtroCategoria !== "todas" && item.categoriaId !== filtroCategoria) return false;
+      if (filtroEstado !== "todos" && item.estado !== filtroEstado) return false;
+      if (busqueda) {
+        const b = busqueda.toLowerCase();
         if (
           !item.nombre.toLowerCase().includes(b) &&
           !(item.notas || "").toLowerCase().includes(b)
         ) return false;
       }
       return true;
-    }), [items, filtros]);
+    }), [items, filtroCategoria, filtroEstado, busqueda]);
 
   const itemsArchivados = useMemo(() => items.filter((i) => !i.activo), [items]);
 
@@ -216,7 +263,7 @@ export function StorageProvider({ children }) {
   return (
     <StorageContext.Provider value={{
       items, itemsFiltrados, itemsArchivados, registros,
-      filtros, setFiltros,
+      filtros, setFiltros, limpiarFiltros,
       cargando, error,
       modo, setModo,
       obtenerItems,

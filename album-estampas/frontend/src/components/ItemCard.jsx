@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { useStorage } from "../context/StorageContext";
 import { getCategoriaById, getEstadoById } from "../utils/categorias";
 
@@ -7,21 +7,13 @@ const rarezaColor = {
   "rara": "#60a5fa", "épica": "#a78bfa", "legendaria": "#facc15",
 };
 
-export function ItemCard({ item, onEditar }) {
-  const { cambiarEstado, archivarItem, agregarRegistro } = useStorage();
-  const [showReg, setShowReg] = useState(false);
-  const [valor, setValor] = useState(1);
-  const [notas, setNotas] = useState("");
+function ItemCardBase({ item, onEditar }) {
+  const { cambiarEstado, archivarItem } = useStorage();
 
   const cat    = getCategoriaById(item.categoriaId);
   const estado = getEstadoById(item.estado);
   const rareza = item.atributos?.rareza || "común";
   const rColor = rarezaColor[rareza] || "#8b90b0";
-
-  const handleRegistro = () => {
-    agregarRegistro({ itemId: item.id, valor, notas });
-    setShowReg(false); setValor(1); setNotas("");
-  };
 
   return (
     <div style={{
@@ -67,30 +59,6 @@ export function ItemCard({ item, onEditar }) {
         <p style={{ fontSize: 12, color: "#8b90b0", fontStyle: "italic", margin: 0 }}>"{item.notas}"</p>
       )}
 
-      {/* registro inline */}
-      {showReg && (
-        <div style={{ background: "#1e2130", borderRadius: 8, padding: 10,
-          border: "1px solid rgba(192,245,250,0.1)", display: "flex", flexDirection: "column", gap: 8 }}>
-          <div style={{ display: "flex", gap: 8 }}>
-            <input type="number" min="1" value={valor}
-              onChange={(e) => setValor(Number(e.target.value))} style={{ width: 70 }} />
-            <input type="text" value={notas}
-              onChange={(e) => setNotas(e.target.value)} placeholder="Notas del día..." style={{ flex: 1 }} />
-          </div>
-          <div style={{ display: "flex", gap: 8 }}>
-            <button onClick={handleRegistro}
-              style={{ background: "#4ade80", color: "#181925", padding: "5px 12px", fontSize: 12, fontWeight: 700, flex: 1 }}>
-              Registrar
-            </button>
-            <button onClick={() => setShowReg(false)}
-              style={{ background: "transparent", color: "#555a7a",
-                border: "1px solid rgba(192,245,250,0.1)", padding: "5px 10px", fontSize: 12 }}>
-              ✕
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* acciones */}
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: "auto" }}>
         <button onClick={() => cambiarEstado(item.id, item.estado === "pegada" ? "faltante" : "pegada")}
@@ -102,10 +70,6 @@ export function ItemCard({ item, onEditar }) {
           style={{ ...btn, color: "#facc15", borderColor: "rgba(250,204,21,0.3)",
             background: item.estado === "repetida" ? "rgba(250,204,21,0.15)" : "transparent" }}>
           Repetida
-        </button>
-        <button onClick={() => setShowReg(!showReg)}
-          style={{ ...btn, color: "#a78bfa", borderColor: "rgba(167,139,250,0.3)" }}>
-          Actividad
         </button>
         <button onClick={() => onEditar(item)}
           style={{ ...btn, color: "#8b90b0", borderColor: "rgba(192,245,250,0.1)", marginLeft: "auto" }}>
@@ -125,3 +89,6 @@ const btn = { background: "transparent", padding: "4px 9px", fontSize: 11, fontW
 function badge(color) {
   return { fontSize: 11, color, background: `${color}15`, border: `1px solid ${color}30`, padding: "2px 7px", borderRadius: 10 };
 }
+
+export const ItemCard = memo(ItemCardBase);
+export default ItemCard;

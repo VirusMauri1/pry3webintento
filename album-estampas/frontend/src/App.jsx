@@ -3,10 +3,12 @@ import { StorageProvider, useStorage } from "./context/StorageContext";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { FormularioItem } from "./components/FormularioItem";
 import { ListaItems } from "./components/ListaItems";
+import { Graficas } from "./components/Graficas";
 import { ModalEditar } from "./components/ModalEditar";
 
 const NAV_ITEMS = [
   { id: "estampas", label: "Mis Estampas" },
+  { id: "graficas", label: "Gráficas" },
   { id: "agregar",  label: "Agregar" },
 ];
 
@@ -131,6 +133,8 @@ function AppInner() {
               nombreInputRef={nombreInputRef}
             />
           </div>
+        ) : vista === "graficas" ? (
+          <Graficas />
         ) : (
           <>
             {/* se muestra el hint de atajo */}

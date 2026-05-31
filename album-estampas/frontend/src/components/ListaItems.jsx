@@ -1,56 +1,21 @@
 import { useState } from "react";
 import { useStorage } from "../context/StorageContext";
 import { ItemCard } from "./ItemCard";
-import { CATEGORIAS, ESTADOS } from "../utils/categorias";
-
-const labelStyle = {
-  display: "block", fontSize: 11, fontWeight: 700, color: "#555a7a",
-  marginBottom: 5, textTransform: "uppercase", letterSpacing: "0.06em",
-};
+import { FiltrosBar } from "./FiltrosBar";
 
 export function ListaItems({ onEditar }) {
-  const { itemsFiltrados, itemsArchivados, filtros, setFiltros, restaurarItem, eliminarItem } = useStorage();
+  const { itemsFiltrados, itemsArchivados, filtros, restaurarItem, eliminarItem } = useStorage();
   const [mostrarArchivados, setMostrarArchivados] = useState(false);
 
-  const hayFiltros = filtros.categoriaId || filtros.estado || filtros.busqueda;
-  const limpiar = () => setFiltros({ categoriaId: "", estado: "", busqueda: "" });
+  const hayFiltros =
+    (filtros.categoriaId && filtros.categoriaId !== "todas") ||
+    (filtros.estado && filtros.estado !== "todos") ||
+    filtros.busqueda;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Filtros */}
-      <div style={{
-        background: "#232638", border: "1px solid rgba(192,245,250,0.1)",
-        borderRadius: 12, padding: 18, display: "flex", gap: 12, flexWrap: "wrap", alignItems: "flex-end",
-      }}>
-        <div style={{ flex: "1 1 180px", minWidth: 140 }}>
-          <label style={labelStyle}> Buscar</label>
-          <input type="text" value={filtros.busqueda}
-            onChange={(e) => setFiltros((f) => ({ ...f, busqueda: e.target.value }))}
-            placeholder="Nombre o notas..." />
-        </div>
-        <div style={{ flex: "1 1 140px", minWidth: 120 }}>
-          <label style={labelStyle}>Categoría</label>
-          <select value={filtros.categoriaId}
-            onChange={(e) => setFiltros((f) => ({ ...f, categoriaId: e.target.value }))}>
-            <option value="">Todas</option>
-            {CATEGORIAS.map((c) => <option key={c.id} value={c.id}>{c.emoji} {c.nombre}</option>)}
-          </select>
-        </div>
-        <div style={{ flex: "1 1 120px", minWidth: 110 }}>
-          <label style={labelStyle}>Estado</label>
-          <select value={filtros.estado}
-            onChange={(e) => setFiltros((f) => ({ ...f, estado: e.target.value }))}>
-            <option value="">Todos</option>
-            {ESTADOS.map((e) => <option key={e.id} value={e.id}>{e.emoji} {e.nombre}</option>)}
-          </select>
-        </div>
-        {hayFiltros && (
-          <button onClick={limpiar} style={{
-            background: "rgba(248,113,113,0.1)", color: "#f87171",
-            border: "1px solid rgba(248,113,113,0.3)", padding: "9px 14px", fontSize: 12, fontWeight: 600,
-          }}>✕ Limpiar</button>
-        )}
-      </div>
+      {/* Filtros (compartidos con la vista de Gráficas vía reducer) */}
+      <FiltrosBar />
 
       <div style={{ fontSize: 13, color: "#555a7a" }}>
         Mostrando <span style={{ color: "#C0F5FA", fontWeight: 700 }}>{itemsFiltrados.length}</span> estampas
