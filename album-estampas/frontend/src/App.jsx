@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { StorageProvider, useStorage } from "./context/StorageContext";
+import { StorageProvider } from "./context/StorageContext";
+import { useStorage } from "./context/useStorage";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import { FormularioItem } from "./components/FormularioItem";
 import { ListaItems } from "./components/ListaItems";
@@ -107,7 +108,7 @@ function AppInner() {
 
       if ((e.key === "t" || e.key === "T") && !enInput) toggleTema();
 
-      if (e.altKey && (e.key === "n" || e.key === "N")) { // Alt+N y no ctrl + n ya que abre nueva ventana
+      if (e.altKey && (e.key === "n" || e.key === "N")) {
         e.preventDefault();
         irAgregar();
       }
@@ -137,7 +138,6 @@ function AppInner() {
           <Graficas />
         ) : (
           <>
-            {/* se muestra el hint de atajo */}
             <p style={{
               fontSize: 12,
               color: "var(--color-text-subtle)",

@@ -7,7 +7,7 @@ import { crearRegistro, crearEventoProgreso } from "../utils/itemFactory";
 import { generarSetMundial } from "../data/estampasMundial";
 
 const API_URL = "http://localhost:3001/api/items";
-const StorageContext = createContext(null);
+export const StorageContext = createContext(null);
 
 async function apiFetch(path = "", options = {}) {
   const res = await fetch(`${API_URL}${path}`, {
@@ -30,13 +30,10 @@ function lsSet(key, value) {
 export function StorageProvider({ children }) {
   const [modo, _setModo] = useState(() => lsGet("modo") || "local");
 
-  // El reducer ahora maneja { lista, filtroCategoria, filtroEstado, busqueda }.
-  // empezar siempre con la lista local si el modo inicial es local
   const [state, dispatch] = useReducer(itemsReducer, initialState, (base) => {
     const modoInicial = lsGet("modo") || "local";
     if (modoInicial === "local") {
       const guardadas = lsGet("items");
-      // Si el álbum está vacío la primera vez, se siembra el set del Mundial
       const lista = (guardadas && guardadas.length > 0) ? guardadas : generarSetMundial();
       return { ...base, lista };
     }
@@ -45,9 +42,6 @@ export function StorageProvider({ children }) {
 
   const { lista: items, filtroCategoria, filtroEstado, busqueda } = state;
 
-  // ref siempre apuntando a la lista actual, para leer el estado anterior
-  // de una estampa sin meter `items` en las deps de los useCallback
-  // (lo que recrearía los handlers y rompería React.memo en ItemCard).
   const itemsRef = useRef(items);
   useEffect(() => { itemsRef.current = items; }, [items]);
 
@@ -71,7 +65,6 @@ export function StorageProvider({ children }) {
     lsSet("registros", registros);
   }, [registros]);
 
-  // Obtener items
   const obtenerItems = useCallback(async () => {
     setCargando(true);
     setError(null);
@@ -92,7 +85,6 @@ export function StorageProvider({ children }) {
     }
   }, [modo]);
 
-  // Cambio de modo
   const setModo = useCallback((nuevoModo) => {
     lsSet("modo", nuevoModo);
     _setModo(nuevoModo);
@@ -106,7 +98,6 @@ export function StorageProvider({ children }) {
     if (modo === "api") obtenerItems();
   }, [modo, obtenerItems]);
 
-  // Agregar y editar item
   const agregarItem = useCallback(async (item) => {
     if (modo === "api") {
       try {
@@ -267,10 +258,4 @@ export function StorageProvider({ children }) {
       {children}
     </StorageContext.Provider>
   );
-}
-
-export function useStorage() {
-  const ctx = useContext(StorageContext);
-  if (!ctx) throw new Error("useStorage debe usarse dentro de StorageProvider");
-  return ctx;
 }

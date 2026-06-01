@@ -1,5 +1,5 @@
 import { useState, memo } from "react";
-import { useStorage } from "../context/StorageContext";
+import { useStorage } from "../context/useStorage";
 import { getCategoriaById, getEstadoById } from "../utils/categorias";
 
 const rarezaColor = {
@@ -21,10 +21,8 @@ function ItemCardBase({ item, onEditar }) {
       borderRadius: 12, padding: 18, display: "flex", flexDirection: "column",
       gap: 10, position: "relative", overflow: "hidden",
     }}>
-      {/* top accent */}
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: cat.color }} />
 
-      {/* header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: 4 }}>
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
@@ -44,7 +42,6 @@ function ItemCardBase({ item, onEditar }) {
         </span>
       </div>
 
-      {/* tags */}
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
         <span style={{ fontSize: 11, color: rColor, background: `${rColor}15`,
           border: `1px solid ${rColor}30`, padding: "2px 7px", borderRadius: 10 }}>
@@ -59,7 +56,6 @@ function ItemCardBase({ item, onEditar }) {
         <p style={{ fontSize: 12, color: "#8b90b0", fontStyle: "italic", margin: 0 }}>"{item.notas}"</p>
       )}
 
-      {/* acciones */}
       <div style={{ display: "flex", gap: 5, flexWrap: "wrap", marginTop: "auto" }}>
         <button onClick={() => cambiarEstado(item.id, item.estado === "pegada" ? "faltante" : "pegada")}
           style={{ ...btn, color: "#4ade80", borderColor: "rgba(74,222,128,0.3)",

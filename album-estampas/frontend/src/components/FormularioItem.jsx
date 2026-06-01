@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useStorage } from "../context/StorageContext";
+import { useStorage } from "../context/useStorage";
 import { crearItem } from "../utils/itemFactory";
 import { CATEGORIAS, ESTADOS } from "../utils/categorias";
 
@@ -34,7 +34,7 @@ export function FormularioItem({ onGuardado, itemEditar = null, onCancelar, nomb
     if (ref.current) {
       ref.current.focus();
     }
-  }, []); 
+  }, []);
 
   const set = (campo) => (e) => {
     const val = e.target.type === "checkbox" ? e.target.checked : e.target.value;

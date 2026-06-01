@@ -1,4 +1,4 @@
-import { useStorage } from "../context/StorageContext";
+import { useStorage } from "../context/useStorage";
 import { CATEGORIAS, ESTADOS } from "../utils/categorias";
 
 const labelStyle = {

@@ -3,11 +3,10 @@ import {
     BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
 } from "recharts";
-import { useStorage } from "../context/StorageContext";
+import { useStorage } from "../context/useStorage";
 import { getCategoriaById } from "../utils/categorias";
 import { FiltrosBar } from "./FiltrosBar";
 
-// usamos los colores de las tarjetas 
 const RAREZA_COLOR = {
     "común": "#8b90b0",
     "poco común": "#4ade80",
@@ -79,7 +78,6 @@ export function Graficas() {
     });
     }, [itemsFiltrados, registros]);
 
-  // grafia 2 pie chart con las cartas 
     const dataCategorias = useMemo(() => {
         const conteo = itemsFiltrados.reduce((acc, item) => {
         acc[item.categoriaId] = (acc[item.categoriaId] || 0) + 1;
@@ -93,7 +91,6 @@ export function Graficas() {
         .sort((a, b) => b.valor - a.valor);
     }, [itemsFiltrados]);
 
-  // gráfica 3: distribución de las calidades de las estampas
     const dataRareza = useMemo(() => {
         const conteo = itemsFiltrados.reduce((acc, item) => {
         const r = item.atributos?.rareza || "común";
@@ -174,4 +171,4 @@ export function Graficas() {
         )}
         </div>
     );
-    }
+}

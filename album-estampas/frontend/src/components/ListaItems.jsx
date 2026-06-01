@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useStorage } from "../context/StorageContext";
+import { useStorage } from "../context/useStorage";
 import { ItemCard } from "./ItemCard";
 import { FiltrosBar } from "./FiltrosBar";
 
@@ -21,7 +21,6 @@ export function ListaItems({ onEditar }) {
         {hayFiltros && " (filtradas)"}
       </div>
 
-      {/* Grid */}
       {itemsFiltrados.length === 0 ? (
         <div style={{ textAlign: "center", padding: "50px 20px", color: "var(--color-text-muted)" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
@@ -35,7 +34,6 @@ export function ListaItems({ onEditar }) {
         </div>
       )}
 
-      {/* Archivados */}
       {itemsArchivados.length > 0 && (
         <div style={{ borderTop: "1px solid rgba(192,245,250,0.1)", paddingTop: 16 }}>
           <button onClick={() => setMostrarArchivados(!mostrarArchivados)}
