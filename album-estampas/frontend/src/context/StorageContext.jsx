@@ -184,7 +184,6 @@ export function StorageProvider({ children }) {
     }
     dispatch({ type: "CAMBIAR_ESTADO", payload: { id, estado, fechaActividad: new Date().toISOString() } });
 
-    // Registrar evento de progreso: +1 si pasa a pegada, -1 si deja de estar pegada.
     const anterior = itemsRef.current.find((i) => i.id === id);
     const estabaPegada = anterior?.estado === "pegada";
     const quedaPegada = estado === "pegada";
@@ -211,17 +210,11 @@ export function StorageProvider({ children }) {
     return r;
   }, [modo]);
 
-  // --- Filtros ahora viven en el reducer (acciones FILTRAR / LIMPIAR_FILTROS) ---
-
-  // objeto de filtros derivado, con la misma forma { categoriaId, estado, busqueda }
-  // que ya consumía ListaItems, para no cambiar ese componente.
   const filtros = useMemo(
     () => ({ categoriaId: filtroCategoria, estado: filtroEstado, busqueda }),
     [filtroCategoria, filtroEstado, busqueda]
   );
 
-  // setFiltros acepta tanto un objeto como una función updater (igual que useState),
-  // y traduce a la acción FILTRAR del reducer.
   const setFiltros = useCallback((next) => {
     const prev = { categoriaId: filtroCategoria, estado: filtroEstado, busqueda };
     const val = typeof next === "function" ? next(prev) : next;
@@ -239,7 +232,6 @@ export function StorageProvider({ children }) {
     dispatch({ type: "LIMPIAR_FILTROS" });
   }, []);
 
-  // Lista filtrada: solo se recalcula si cambian la lista o los filtros (useMemo)
   const itemsFiltrados = useMemo(() =>
     items.filter((item) => {
       if (!item.activo) return false;

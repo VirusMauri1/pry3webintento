@@ -15,7 +15,7 @@ export function itemsReducer(state, action) {
     case "AGREGAR":
       return { ...state, lista: [...state.lista, action.payload] };
 
-    // Archiva el Item (activo = false). El item completo (con su
+    // Archiva el Item (activo = false).
     case "ELIMINAR":
       return {
         ...state,
@@ -59,7 +59,7 @@ export function itemsReducer(state, action) {
         ),
       };
 
-    // Edita un Item existente (fusiona campos del payload)
+    // Edita un Item existente
     case "EDITAR":
       return {
         ...state,

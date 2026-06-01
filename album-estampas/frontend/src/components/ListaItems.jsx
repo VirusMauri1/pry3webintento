@@ -14,17 +14,16 @@ export function ListaItems({ onEditar }) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-      {/* Filtros (compartidos con la vista de Gráficas vía reducer) */}
       <FiltrosBar />
 
-      <div style={{ fontSize: 13, color: "#555a7a" }}>
-        Mostrando <span style={{ color: "#C0F5FA", fontWeight: 700 }}>{itemsFiltrados.length}</span> estampas
+      <div style={{ fontSize: 13, color: "var(--color-text-subtle)" }}>
+        Mostrando <span style={{ color: "var(--color-accent)", fontWeight: 700 }}>{itemsFiltrados.length}</span> estampas
         {hayFiltros && " (filtradas)"}
       </div>
 
       {/* Grid */}
       {itemsFiltrados.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "50px 20px", color: "#555a7a" }}>
+        <div style={{ textAlign: "center", padding: "50px 20px", color: "var(--color-text-muted)" }}>
           <div style={{ fontSize: 40, marginBottom: 12 }}>📭</div>
           <p style={{ fontSize: 15, fontWeight: 600 }}>
             {hayFiltros ? "No hay estampas con esos filtros" : "Aún no hay estampas"}
@@ -40,27 +39,27 @@ export function ListaItems({ onEditar }) {
       {itemsArchivados.length > 0 && (
         <div style={{ borderTop: "1px solid rgba(192,245,250,0.1)", paddingTop: 16 }}>
           <button onClick={() => setMostrarArchivados(!mostrarArchivados)}
-            style={{ background: "transparent", color: "#555a7a",
-              border: "1px solid rgba(192,245,250,0.1)", padding: "7px 14px", fontSize: 12 }}>
+            style={{ background: "transparent", color: "var(--color-text-muted)",
+              border: "1px solid var(--color-border)", padding: "7px 14px", fontSize: 12 }}>
             Archivadas ({itemsArchivados.length}) {mostrarArchivados ? "▲" : "▼"}
           </button>
           {mostrarArchivados && (
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12, opacity: 0.7 }}>
               {itemsArchivados.map((item) => (
                 <div key={item.id} style={{
-                  background: "#232638", border: "1px solid rgba(192,245,250,0.1)",
+                  background: "var(--color-bg-surface)", border: "1px solid var(--color-border)",
                   borderRadius: 8, padding: "10px 14px",
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}>
-                  <span style={{ fontSize: 13, color: "#8b90b0" }}>📦 {item.nombre}</span>
+                  <span style={{ fontSize: 13, color: "var(--color-text-muted)" }}>📦 {item.nombre}</span>
                   <div style={{ display: "flex", gap: 6 }}>
                     <button onClick={() => restaurarItem(item.id)}
-                      style={{ background: "rgba(74,222,128,0.1)", color: "#4ade80",
+                      style={{ background: "rgba(74,222,128,0.1)", color: "var(--color-success)",
                         border: "1px solid rgba(74,222,128,0.3)", padding: "4px 10px", fontSize: 11 }}>
                       Restaurar
                     </button>
                     <button onClick={() => eliminarItem(item.id)}
-                      style={{ background: "rgba(248,113,113,0.1)", color: "#f87171",
+                      style={{ background: "rgba(248,113,113,0.1)", color: "var(--color-error)",
                         border: "1px solid rgba(248,113,113,0.3)", padding: "4px 10px", fontSize: 11 }}>
                       Eliminar
                     </button>

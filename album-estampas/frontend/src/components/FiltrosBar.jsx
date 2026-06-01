@@ -49,4 +49,4 @@ export function FiltrosBar() {
         )}
         </div>
     );
-    }
+}
